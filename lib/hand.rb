@@ -113,9 +113,20 @@ class Hand
       second_sorted = second_hand.sort_hand
       Hand.get_high_card(first_sorted, second_sorted)
     when :four_of_a_kind, :three_of_a_kind, :full_house
+      Hand.get_high_set(first_hand, second_hand)
     when :two_pair
     when :one_pair
     end
+  end
+
+  def self.get_high_set(first_hand, second_hand)
+    first_hand_counts = first_hand.card_counts
+    second_hand_counts = second_hand.card_counts
+
+    first_key = first_hand_counts.select { |_, v| v >= 3 }.keys.first
+    second_key = second_hand_counts.select { |_, v| v >= 3 }.keys.first
+
+    first_key > second_key ? first_hand : second_hand
   end
 
   def self.get_high_card(first_hand, second_hand)

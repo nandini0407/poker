@@ -128,7 +128,22 @@ describe Hand do
   end
 
   describe '#determine_hand' do
-    it 'returns the best hand category of that hand'
+    let(:straight_flush) { [[:h, 10], [:h, 11], [:h, 8], [:h, 9], [:h, 12]] }
+    let(:my_hand1) { Hand.new(straight_flush) }
+    let(:full_house) { [[:h, 10], [:d, 10], [:c, 10], [:s, 12], [:h, 12]] }
+    let(:my_hand2) { Hand.new(full_house) }
+    let(:flush) { [[:h, 10], [:h, 7], [:h, 5], [:h, 2], [:h, 12]] }
+    subject(:my_hand3) { Hand.new(flush) }
+
+    it 'returns the best hand category of that hand' do
+      straight_flush.each { |card| allow(card).to receive(:value).and_return(card.last) }
+      straight_flush.each { |card| allow(card).to receive(:suit).and_return(:h) }
+      full_house.each { |card| allow(card).to receive(:value).and_return(card.last) }
+      flush.each { |card| allow(card).to receive(:suit).and_return(:h) }
+      expect(my_hand1.determine_hand).to eq(:straight_flush)
+      expect(my_hand2.determine_hand).to eq(:full_house)
+      expect(my_hand3.determine_hand).to eq(:flush)
+    end
   end
 
   describe '#strongest_hand' do
@@ -172,6 +187,18 @@ describe Hand do
         expect(Hand.get_high_card(my_hand1, my_hand2)).to eq(nil)
       end
     end
-
   end
+
+  describe '::get_high_set' do
+    let(:cards1) { [[:h, 2], [:d, 2], [:c, 2], [:s, 2], [:h, 11]] }
+    let(:cards2) { [[:h, 4], [:d, 4], [:c, 4], [:s, 4], [:h, 12]] }
+    let(:my_hand1) { Hand.new(cards1) }
+    let(:my_hand2) { Hand.new(cards2) }
+    it 'returns the hand that has the highest set of cards' do
+      cards1.each { |card| allow(card).to receive(:value).and_return(card.last) }
+      cards2.each { |card| allow(card).to receive(:value).and_return(card.last) }
+      expect(Hand.get_high_set(my_hand1, my_hand2)).to eq(my_hand2)
+    end
+  end
+
 end
